@@ -1,0 +1,4 @@
+#custom ignore
+.env
+writable/
+app/Config/Constans.php
