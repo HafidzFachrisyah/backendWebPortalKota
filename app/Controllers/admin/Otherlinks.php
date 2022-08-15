@@ -133,17 +133,30 @@ class Otherlinks extends BaseController
 
 		for($i=1; $i <= $otherLinkCount ; $i++ ){
 			$active = ($pageNumber==$i)? 'active' : '';
-			echo '
+			if(($i > ($pageNumber-3)) AND ($i < $pageNumber)) {
+				echo '
 				<li class="page-item '. $active .'"><a class="page-link '. $active .'" href="'. BASE_URL().SITE_URL.'otherlink/'. $i . $q .'">'. $i .'</a></li>
 			';
+			}
+
+			if($i == $pageNumber) {
+				echo '
+				<li class="page-item '. $active .'"><a class="page-link '. $active .'" href="'. BASE_URL().SITE_URL.'otherlink/'. $i . $q .'">'. $i .'</a></li>
+			';
+			}
+
+			if(($i < ($pageNumber+3)) AND ($i > $pageNumber)) {
+				echo '
+				<li class="page-item '. $active .'"><a class="page-link '. $active .'" href="'. BASE_URL().SITE_URL.'otherlink/'. $i . $q .'">'. $i .'</a></li>
+			';
+			}
 		 } 
 
-		 if($pageNumber<2 AND $otherLinkCount!=0){
-			if($pageNumber != $otherLinkCount) {
+		 if($pageNumber<$otherLinkCount){
 			echo '
 				<li class="page-item"><a class="page-link" href="'. BASE_URL().SITE_URL.'otherlink/'.$otherLinkCount. $q .'"><i class="fa fa-chevron-right"></i><i class="fa fa-chevron-right"></i></a></li>
 			';
-			}
+			
 		}
 
 	}

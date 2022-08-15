@@ -118,17 +118,32 @@ class Banners extends BaseController
 
 		for($i=1; $i <= $pageCount ; $i++ ){
 			$active = ($pageNumber==$i)? 'active' : '';
-			echo '
+
+			if(($i > ($pageNumber-3)) AND ($i < $pageNumber)) {
+				echo '
 				<li class="page-item '. $active .'"><a class="page-link '. $active .'" href="'. BASE_URL().SITE_URL.'banner/'. $i .'">'. $i .'</a></li>
 			';
+			}
+
+			if($i == $pageNumber) {
+				echo '
+				<li class="page-item '. $active .'"><a class="page-link '. $active .'" href="'. BASE_URL().SITE_URL.'banner/'. $i .'">'. $i .'</a></li>
+			';
+			}
+
+			if(($i < ($pageNumber+3)) AND ($i > $pageNumber)) {
+				echo '
+				<li class="page-item '. $active .'"><a class="page-link '. $active .'" href="'. BASE_URL().SITE_URL.'banner/'. $i .'">'. $i .'</a></li>
+			';
+			}
+
 		 } 
 
-		 if($pageNumber<2 AND $pageCount!=0){
-			if($pageNumber != $pageCount) {
+		 if($pageNumber < $pageCount){
 			echo '
 				<li class="page-item"><a class="page-link" href="'. BASE_URL().SITE_URL.'banner/'.$pageCount.'"><i class="fa fa-chevron-right"></i><i class="fa fa-chevron-right"></i></a></li>
 			';
-			}
+			
 		}
 
 	}

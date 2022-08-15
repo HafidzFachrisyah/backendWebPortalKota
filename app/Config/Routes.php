@@ -55,6 +55,8 @@ if(empty(session()->userData)){
         $routes->post('post/upload', 'opd\Posts::upload');
         $routes->post('post/delete', 'opd\Posts::delete');
 
+        
+
         //profile route
         $routes->get('user/profile', 'opd\User::profile');
         $routes->get('user/password', 'opd\User::password');
@@ -96,6 +98,8 @@ if(empty(session()->userData)){
        $routes->post('post/store', 'admin\Posts::store');
        $routes->post('post/upload', 'admin\Posts::upload');
        $routes->post('post/delete', 'admin\Posts::delete');
+
+       $routes->get('inject/store', 'admin\Injects::store');
 
         //page route
         $routes->get('page', 'admin\Pages');
