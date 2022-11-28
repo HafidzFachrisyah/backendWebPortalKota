@@ -77,6 +77,7 @@
                 </div>
                 <div class="col col-2 text-right clearfix">
                   <div class="input-group text-right clearfix">
+                      
                       <button type="submit" id="btn_f_infograph" class="btn btn-info float-right"><i class="fa fa-save"></i> <?= ($id)?'Update':'Save'?></button>
                     </div>
                 </div>
@@ -98,13 +99,15 @@
                      
                         <img class="img-thumbnail" id="cover-thumbnail" src="<?= API_SITE.$image->attributes->url?>">
             
-                      <input name="cover-default" id="cover-default" type="hidden" value="<?= $image->id?>">
+                        <input name="cover-default" id="cover-default" type="hidden" value="<?= $image->id?>">
                   </div>
 
                   <div class="mb-3">
+                    <?php if($id ==''){?>
                       <label for="cover" class="form-label">Infograph Image</label>
                       <input class="form-control" name="cover" id="cover" type="file" accept=".jpg,.jpeg,.png" onchange="document.getElementById('cover-thumbnail').src = window.URL.createObjectURL(this.files[0])" required>
                       <input name="cover-default" id="cover-default" type="hidden" value="<?= $image->id?>">
+                      <?php } ?>
                   </div>
 
                   <div class="form-check form-switch mb-3">
@@ -211,9 +214,11 @@
         $("#btn_f_infograph").prop('disabled', true);
         $("#btn_f_infograph").html('Saving..');
         var data = new FormData();
+        <?php if($id ==''){?>
         jQuery.each(jQuery('#cover')[0].files, function(i, file) {
             data.append('cover-'+i, file);
         });
+        <?php } ?>
 
           data.append('data', jQuery('#f_infograph').serialize());
 

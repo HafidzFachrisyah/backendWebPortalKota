@@ -145,10 +145,11 @@ return $response;
 
 function getAllPost($pageNumber,$q){
    
+  $q = urlencode($q);
   $jwt = session()->jwt;
   $authorization = "Authorization: Bearer ".$jwt;
   $id_user = session()->userData->id;
-  $ch = curl_init(API_URL . 'articles?populate=*&filters[title][$containsi]='.$q.'&filters[penulis][id][$eq]='.$id_user.'&sort[1]=updatedAt%3Adesc&pagination[page]='.$pageNumber.'&pagination[pageSize]=5');
+  $ch = curl_init(API_URL . 'articles?populate=*&filters[title][$containsi]='.$q.'&filters[penulis][id][$eq]='.$id_user.'&sort[1]=updatedAt%3Adesc&pagination[page]='.$pageNumber.'&pagination[pageSize]=15');
   curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json' , $authorization ));
 
   
@@ -171,8 +172,9 @@ return $response;
 function getAllPostAdmin($pageNumber,$q){
    
   $jwt = session()->jwt;
+  $q = urlencode($q);
   $authorization = "Authorization: Bearer ".$jwt;
-  $ch = curl_init(API_URL . 'articles?populate[0]=category.*&populate[1]=penulis.opd&populate[3]=image.*&filters[title][$containsi]='.$q.'&sort[1]=updatedAt%3Adesc&pagination[page]='.$pageNumber.'&pagination[pageSize]=5');
+  $ch = curl_init(API_URL . 'articles?populate[0]=category.*&populate[1]=penulis.opd&populate[3]=image.*&filters[title][$containsi]='.$q.'&sort[1]=updatedAt%3Adesc&pagination[page]='.$pageNumber.'&pagination[pageSize]=15');
   curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json' , $authorization ));
 
   
@@ -197,7 +199,57 @@ function getAllPublishedPost(){
   $jwt = session()->jwt;
   $authorization = "Authorization: Bearer ".$jwt;
   $id_user = session()->userData->id;
-  $ch = curl_init(API_URL . 'articles?populate=*&filters[Published][$eq]=true&filters[Published][$eq]=true&filters[penulis][id][$eq]='.$id_user.'&sort[1]=updatedAt%3Adesc&pagination[page]=1&pagination[pageSize]=10');
+  $ch = curl_init(API_URL . 'articles?populate=*&filters[Published][$eq]=true&filters[Published][$eq]=true&filters[penulis][id][$eq]='.$id_user.'&sort[1]=updatedAt%3Adesc&pagination[page]=1&pagination[pageSize]=15');
+  curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json' , $authorization ));
+
+  
+  curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+  
+  // execute!
+  $response = curl_exec($ch);
+  
+  // close the connection, release resources used
+  curl_close($ch);
+  
+  $response = json_decode($response);
+  $response = $response;
+  // do anything you want with your response
+  
+return $response;
+
+}
+
+function getAllPublishedPostWidget(){
+   
+  $jwt = session()->jwt;
+  $authorization = "Authorization: Bearer ".$jwt;
+  $ch = curl_init(API_URL . 'articles?populate=*&filters[Published][$eq]=true&filters[Published][$eq]=true&sort[1]=updatedAt%3Adesc&pagination[page]=1&pagination[pageSize]=5');
+  curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json' , $authorization ));
+
+  
+  curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+  
+  // execute!
+  $response = curl_exec($ch);
+  
+  // close the connection, release resources used
+  curl_close($ch);
+  
+  $response = json_decode($response);
+  $response = $response->data;
+  // do anything you want with your response
+  
+return $response;
+
+}
+
+
+function getAllDraftPost(){
+   
+  $jwt = session()->jwt;
+  $authorization = "Authorization: Bearer ".$jwt;
+  $id_user = session()->userData->id;
+  $ch = curl_init(API_URL . 'articles?populate=*&filters[Published][$eq]=false&filters[penulis][id][$eq]='.$id_user.'&sort[1]=updatedAt%3Adesc&pagination[page]=1&pagination[pageSize]=15');
   curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json' , $authorization ));
 
   
@@ -218,12 +270,35 @@ return $response;
 }
 
 
-function getAllDraftPost(){
+function getUser($q){
+
+  $q = urlencode($q);
+  $jwt = session()->jwt;
+  $authorization = "Authorization: Bearer ".$jwt;
+  $ch = curl_init(API_URL . 'users?populate=*&filters[username][$containsi]='.$q.'&sort[1]=username%3Aasc');
+  curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json' , $authorization ));
+
+  
+  curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+  
+  // execute!
+  $response = curl_exec($ch);
+  
+  // close the connection, release resources used
+  curl_close($ch);
+  $response = json_decode($response);
+  $response = $response;
+  // do anything you want with your response
+  
+return $response;
+
+}
+
+function getUserByUsername($username){
    
   $jwt = session()->jwt;
   $authorization = "Authorization: Bearer ".$jwt;
-  $id_user = session()->userData->id;
-  $ch = curl_init(API_URL . 'articles?populate=*&filters[Published][$eq]=false&filters[penulis][id][$eq]='.$id_user.'&sort[1]=updatedAt%3Adesc&pagination[page]=1&pagination[pageSize]=10');
+  $ch = curl_init(API_URL . 'users?populate=*&filters[username][$eq]='.$username);
   curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json' , $authorization ));
 
   
@@ -237,6 +312,77 @@ function getAllDraftPost(){
   
   $response = json_decode($response);
   $response = $response;
+  // do anything you want with your response
+  
+return $response;
+
+}
+
+function getUserByEmail($email){
+   
+  $jwt = session()->jwt;
+  $authorization = "Authorization: Bearer ".$jwt;
+  $ch = curl_init(API_URL . 'users?populate=*&filters[email][$eq]='.$email);
+  curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json' , $authorization ));
+
+  
+  curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+  
+  // execute!
+  $response = curl_exec($ch);
+  
+  // close the connection, release resources used
+  curl_close($ch);
+  
+  $response = json_decode($response);
+  $response = $response;
+  // do anything you want with your response
+  
+return $response;
+
+}
+
+function getUserById($id){
+   
+  $jwt = session()->jwt;
+  $authorization = "Authorization: Bearer ".$jwt;
+  $ch = curl_init(API_URL . 'users/'.$id.'?populate=*');
+  curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json' , $authorization ));
+
+  
+  curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+  
+  // execute!
+  $response = curl_exec($ch);
+  
+  // close the connection, release resources used
+  curl_close($ch);
+  
+  $response = json_decode($response);
+  $response = $response;
+  // do anything you want with your response
+  
+return $response;
+
+}
+
+function getOpd(){
+  $jwt = session()->jwt;
+  $authorization = "Authorization: Bearer ".$jwt;
+  $ch = curl_init(API_URL . 'opds?sort[1]=name%3Aasc&pagination[page]=1&pagination[pageSize]=100');
+  curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json' , $authorization ));
+
+  
+  curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+  
+  // execute!
+  $response = curl_exec($ch);
+  
+  // close the connection, release resources used
+  curl_close($ch);
+  $response = json_decode($response);
+  $response = $response->data;
+  
   // do anything you want with your response
   
 return $response;
@@ -369,6 +515,42 @@ function postArticle($data){
 }
 
 
+function postUser($data){
+
+  $jwt = session()->jwt;
+  $authorization = "Authorization: Bearer ".$jwt;
+  $url = API_URL . 'users';
+
+  $headers = array("Content-Type:application/json",$authorization); // cURL headers for file uploading
+  $postfields = json_encode($data);
+  
+  $ch = curl_init();
+  $options = array(
+      CURLOPT_URL => $url,
+      CURLOPT_HEADER => false,
+      CURLOPT_POST => 1,
+      CURLOPT_CUSTOMREQUEST => 'POST',
+      CURLOPT_HTTPHEADER => $headers,
+      CURLOPT_POSTFIELDS => rawurldecode($postfields),
+      CURLOPT_RETURNTRANSFER => true
+  ); // cURL options
+
+  curl_setopt_array($ch, $options);
+  $response = curl_exec($ch);
+  $httpcode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+  curl_close($ch);
+  
+  $response = json_decode($response);
+  $data = [
+    "data" => $response,
+    "status" => $httpcode
+  ];
+  
+ 
+  return (object) $data;
+
+}
+
 function updateArticle($id,$data){
 
   $jwt = session()->jwt;
@@ -448,6 +630,44 @@ function updateProfile($data){
 }
 
 
+function updateUser($data,$id_user){
+
+  $jwt = session()->jwt;
+  $authorization = "Authorization: Bearer ".$jwt;
+  $url = API_URL . 'users/'.$id_user;
+
+  $headers = array("Content-Type:application/json",$authorization); // cURL headers for file uploading
+  $postfields = json_encode($data);
+
+  
+  
+  $ch = curl_init();
+  $options = array(
+      CURLOPT_URL => $url,
+      CURLOPT_HEADER => false,
+      CURLOPT_POST => 1,
+      CURLOPT_CUSTOMREQUEST => 'PUT',
+      CURLOPT_HTTPHEADER => $headers,
+      CURLOPT_POSTFIELDS => rawurldecode($postfields),
+      CURLOPT_RETURNTRANSFER => true
+  ); // cURL options
+
+  curl_setopt_array($ch, $options);
+  $response = curl_exec($ch);
+  $httpcode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+  curl_close($ch);
+  
+  $response = json_decode($response);
+  $data = [
+    "data" => $response,
+    "status" => $httpcode
+  ];
+  
+ 
+  return (object) $data;
+
+}
+
 function updatePassword($data){
 
   $jwt = session()->jwt;
@@ -525,6 +745,43 @@ function deleteArticle($id){
 
 }
 
+function deleteUser($id){
+
+  $jwt = session()->jwt;
+  $authorization = "Authorization: Bearer ".$jwt;
+  $url = API_URL . 'users/'.$id;
+
+  $headers = array("Content-Type:application/json",$authorization); // cURL headers for file uploading
+
+  
+  
+  $ch = curl_init();
+  $options = array(
+      CURLOPT_URL => $url,
+      CURLOPT_HEADER => false,
+      CURLOPT_POST => 1,
+      CURLOPT_CUSTOMREQUEST => 'DELETE',
+      CURLOPT_HTTPHEADER => $headers,
+      CURLOPT_RETURNTRANSFER => true
+  ); // cURL options
+
+  curl_setopt_array($ch, $options);
+  $response = curl_exec($ch);
+  $httpcode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+  curl_close($ch);
+  
+  $response = json_decode($response);
+  $data = [
+    "data" => $response,
+    "status" => $httpcode
+  ];
+  
+ 
+  return (object) $data;
+
+}
+
+
 
 function getPostById($id){
    
@@ -553,10 +810,11 @@ return $response;
 
 function getAllPage($pageNumber,$q){
    
+  $q = urlencode($q);
   $jwt = session()->jwt;
   $authorization = "Authorization: Bearer ".$jwt;
   $id_user = session()->userData->id;
-  $ch = curl_init(API_URL . 'pages?populate=*&filters[title][$containsi]='.$q.'&sort[1]=updatedAt%3Adesc&pagination[page]='.$pageNumber.'&pagination[pageSize]=5');
+  $ch = curl_init(API_URL . 'pages?populate=*&filters[title][$containsi]='.$q.'&sort[1]=updatedAt%3Adesc&pagination[page]='.$pageNumber.'&pagination[pageSize]=15');
   curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json' , $authorization ));
 
   
@@ -771,7 +1029,7 @@ function getAllBanner($pageNumber){
   $jwt = session()->jwt;
   $authorization = "Authorization: Bearer ".$jwt;
   $id_user = session()->userData->id;
-  $ch = curl_init(API_URL . 'banners?populate=*&sort[1]=updatedAt%3Adesc&pagination[page]='.$pageNumber.'&pagination[pageSize]=5');
+  $ch = curl_init(API_URL . 'banners?populate=*&sort[1]=updatedAt%3Adesc&pagination[page]='.$pageNumber.'&pagination[pageSize]=15');
   curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json' , $authorization ));
 
   
@@ -937,7 +1195,7 @@ function getAllInfograph($pageNumber){
   $jwt = session()->jwt;
   $authorization = "Authorization: Bearer ".$jwt;
   $id_user = session()->userData->id;
-  $ch = curl_init(API_URL . 'infographs?populate=*&sort[1]=updatedAt%3Adesc&pagination[page]='.$pageNumber.'&pagination[pageSize]=5');
+  $ch = curl_init(API_URL . 'infographs?populate=*&sort[1]=updatedAt%3Adesc&pagination[page]='.$pageNumber.'&pagination[pageSize]=15');
   curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json' , $authorization ));
 
   
@@ -1266,9 +1524,10 @@ return $response;
 
 function getAllOtherlink($pageNumber,$q){
    
+  $q = urlencode($q);
   $jwt = session()->jwt;
   $authorization = "Authorization: Bearer ".$jwt;
-  $ch = curl_init(API_URL . 'layanan-links?filters[nama][$containsi]='.$q.'&sort[1]=updatedAt%3Adesc&pagination[page]='.$pageNumber.'&pagination[pageSize]=5');
+  $ch = curl_init(API_URL . 'layanan-links?filters[nama][$containsi]='.$q.'&sort[1]=updatedAt%3Adesc&pagination[page]='.$pageNumber.'&pagination[pageSize]=15');
   curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json' , $authorization ));
 
   

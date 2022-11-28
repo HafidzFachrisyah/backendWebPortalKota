@@ -67,7 +67,7 @@
        
 
         $('#q').on('input',function(e){
-          $("#allPage").load("<?= base_url().SITE_URL ?>page/getAllPage/1?q="+$('#q').val());
+          $("#allPage").load("<?= base_url().SITE_URL ?>page/getAllPage/1?q="+encodeURI($('#q').val()));
         });
 
         

@@ -2,7 +2,7 @@
 
 use App\Controllers\BaseController;
 
-class Infographs extends BaseController
+class Accounts extends BaseController
 {
 
 	public function __construct() {
@@ -15,17 +15,23 @@ class Infographs extends BaseController
 	public function index($pageNumber=null)
 	{
 		$actuaLlink = 'https://'.$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI'];
-		$data['param'] = str_replace('https://'.$_SERVER['HTTP_HOST'].'/infograph/','',$actuaLlink);
+		$data['param'] = str_replace('https://'.$_SERVER['HTTP_HOST'].'/account/','',$actuaLlink);
 	
-		if($data['param']=='https://'.$_SERVER['HTTP_HOST'].'/infograph'){
+		if($data['param']=='https://'.$_SERVER['HTTP_HOST'].'/account'){
 			$data['param'] = '';
 		} else {
 			$data['param'] = '/'.$data['param'];
 		}
 
 		
-		$data['pageTitle'] = 'Infographs';
+		$data['pageTitle'] = 'Account';
 		$get = $this->request->getGet();
+
+		if(array_key_exists('q', $get)){
+			$data['q']=$get['q'];
+		} else {
+			$data['q']='';
+		}
 		
 
 		if($pageNumber!=null){
@@ -35,28 +41,36 @@ class Infographs extends BaseController
 		}
 
 
-		$data['pageCount'] = getAllInfograph($data['pageNumber'])->meta->pagination->pageCount;
-		$data['allInfograph'] = getAllInfograph($data['pageNumber'])->data;
-		return view('admin/infographs',$data);
+		$data['pageCount'] = getAllPost($data['pageNumber'],$data['q'])->meta->pagination->pageCount;
+		$data['allPost'] = getAllPost($data['pageNumber'],$data['q'])->data;
+		return view('admin/posts',$data);
 	}
 
 
-	public function getAllInfograph($pageNumber=null)
+	public function getAllPost($pageNumber=null)
 	{
 		
 
 		$get = $this->request->getGet();
+
+		if(array_key_exists('q', $get)){
+			$data['q']=$get['q'];
+		} else {
+			$data['q']='';
+		}
 		
 	
+
 		if($pageNumber!=null){
 			$data['pageNumber']=$pageNumber;
 		} else {
 			$data['pageNumber']=1;
 		}
 
-		$allInfograph = getAllInfograph($data['pageNumber'])->data;
+		$allPost = getAllPostAdmin($data['pageNumber'],$data['q'])->data;
+		
 
-		if(count($allInfograph)==0){
+		if(count($allPost)==0){
 			echo '
 				<tr>
 					<td colspan="6" class="text-center pt-2">
@@ -67,25 +81,40 @@ class Infographs extends BaseController
 			';
 		}
 		
-		foreach($allInfograph as $infograph){ 
-			$statusClass = ($infograph->attributes->Published)? 'info' : 'primary';
-			$status = ($infograph->attributes->Published)? 'Published' : 'Draft';
+		foreach($allPost as $post){ 
+			$statusClass = ($post->attributes->Published)? 'info' : 'primary';
+			$status = ($post->attributes->Published)? 'Published' : 'Draft';
 			echo '
 			<tr>
-			  <td>
-					<img src="'.API_SITE.$infograph->attributes->image->data->attributes->formats->thumbnail->url.'" class="img-thumbnail me-3" width="100">
+			  <td  style="min-width: 50px;max-width: 50px;">
+					<img src="'.API_SITE.$post->attributes->image->data->attributes->formats->thumbnail->url.'" class="img-thumbnail me-3" width="100">
 			  </td>
-			 
-			  <td>
-				<p class="text-xs font-weight-bold mb-0">'. date("d M Y",strtotime($infograph->attributes->updatedAt)) .'</p>
+			  <td class="text-wrap" style="word-wrap: break-word !important;min-width: 160px;max-width: 160px;">
+					<h6 class="mb-0 text-sm text-wrap" style="word-wrap: break-word">'. $post->attributes->title .'</h6>
 			  </td>
+			  
+			  <td>
+				<p class="text-xs font-weight-bold mb-0">'. date("d M Y",strtotime($post->attributes->updatedAt)) .'</p>
+			  </td>
+
+			  <td  class="align-middle text-center text-sm">
+			  	<p class="text-xs mb-0">'. $post->attributes->category->data->attributes->name .'</p>
+			  </td>
+
+			  <td  class="align-middle text-center text-sm">
+			  	<p class="text-xs mb-0">'. $post->attributes->penulis->data->attributes->username .'</p>
+			  </td>
+			  
+			  <td  class="align-middle text-center text-sm">
+				  <p class="text-xs mb-0">'. $post->attributes->penulis->data->attributes->opd->data->attributes->name .'</p>
+		 	 </td>
 			
 			  <td class="align-middle text-center text-sm">
 				<span class="badge badge-sm bg-gradient-'.$statusClass.'">'.$status.'</span>
 			  </td>
 			  
 			  <td class="align-middle">
-					<a href="'. base_url().SITE_URL.'infograph/editor/'.$infograph->id .'" class="text-sm" title="edit"><i class="fa fa-edit"></i></a>
+					<a href="'. base_url().SITE_URL.'post/editor/'.$post->id .'" class="text-sm" title="edit"><i class="fa fa-edit"></i></a>
 			  </td>
 			</tr>
 			';
@@ -99,6 +128,12 @@ class Infographs extends BaseController
 		
 		$get = $this->request->getGet();
 
+		if(array_key_exists('q', $get)){
+			$q = '/'.$get['q'];
+		} else {
+			$q ='';
+		}
+
 		
 		if($pageNumber!=NULL){
 			$pageNumber = $pageNumber;
@@ -108,42 +143,43 @@ class Infographs extends BaseController
 		
 		
 
-		$pageCount = getAllInfograph($pageNumber)->meta->pagination->pageCount;
+		$pageCount = getAllPostAdmin($pageNumber,$q)->meta->pagination->pageCount;
 
 		if($pageNumber>1){
 			echo '
-				<li class="page-item"><a class="page-link" href="'. BASE_URL().SITE_URL.'infograph/1><i class="fa fa-chevron-left"></i><i class="fa fa-chevron-left"></i></a></li>
+				<li class="page-item"><a class="page-link" href="'. BASE_URL().SITE_URL.'post/1'. $q .'"><i class="fa fa-chevron-left"></i><i class="fa fa-chevron-left"></i></a></li>
 			';
 		}
 
+	
 		for($i=1; $i <= $pageCount ; $i++ ){
 			$active = ($pageNumber==$i)? 'active' : '';
-
+			
 			if(($i > ($pageNumber-3)) AND ($i < $pageNumber)) {
 				echo '
-				<li class="page-item '. $active .'"><a class="page-link '. $active .'" href="'. BASE_URL().SITE_URL.'infograph/'. $i .'">'. $i .'</a></li>
+				<li class="page-item '. $active .'"><a class="page-link '. $active .'" href="'. BASE_URL().SITE_URL.'post/'. $i . $q .'">'. $i .'</a></li>
 			';
 			}
 
 			if($i == $pageNumber) {
 				echo '
-				<li class="page-item '. $active .'"><a class="page-link '. $active .'" href="'. BASE_URL().SITE_URL.'infograph/'. $i .'">'. $i .'</a></li>
+				<li class="page-item '. $active .'"><a class="page-link '. $active .'" href="'. BASE_URL().SITE_URL.'post/'. $i . $q .'">'. $i .'</a></li>
 			';
 			}
 
 			if(($i < ($pageNumber+3)) AND ($i > $pageNumber)) {
 				echo '
-				<li class="page-item '. $active .'"><a class="page-link '. $active .'" href="'. BASE_URL().SITE_URL.'infograph/'. $i .'">'. $i .'</a></li>
+				<li class="page-item '. $active .'"><a class="page-link '. $active .'" href="'. BASE_URL().SITE_URL.'post/'. $i . $q .'">'. $i .'</a></li>
 			';
 			}
 
+		
 		 } 
 
-		 if($pageNumber< $pageCount){
+		 if($pageNumber < $pageCount){
 			echo '
-				<li class="page-item"><a class="page-link" href="'. BASE_URL().SITE_URL.'infograph/'.$pageCount.'"><i class="fa fa-chevron-right"></i><i class="fa fa-chevron-right"></i></a></li>
+				<li class="page-item"><a class="page-link" href="'. BASE_URL().SITE_URL.'post/'.$pageCount. $q .'"><i class="fa fa-chevron-right"></i><i class="fa fa-chevron-right"></i></a></li>
 			';
-			
 		}
 
 	}
@@ -151,49 +187,63 @@ class Infographs extends BaseController
 	public function new($id = null)
 	{
 		if($id){
-			$data['pageTitle'] = 'Edit Infograph';
+			$data['pageTitle'] = 'Edit Post';
 		} else {
-			$data['pageTitle'] = 'New Infograph';
+			$data['pageTitle'] = 'New Post';
 		}
+		$data['categories'] = getCategories();
 	
 		if(isset($id)){
 			$data['id'] = $id;
-			$infograph = getInfographById($id);
-			if($infograph->meta->pagination->total==0) {
-				return redirect()->to(base_url().SITE_URL.'infograph'); 
+			$article = getPostById($id);
+			if($article->meta->pagination->total==0) {
+				return redirect()->to(base_url().SITE_URL.'post'); 
 			}
-			
-			$data['published'] = $infograph->data[0]->attributes->Published; 
-			
+			$data['slug'] = $article->data[0]->attributes->slug; 
+			$data['title'] = $article->data[0]->attributes->title; 
+			$data['description'] = $article->data[0]->attributes->description; 
+			$data['content'] = $article->data[0]->attributes->content;
+			$data['published'] = $article->data[0]->attributes->Published; 
+			$data['category'] = $article->data[0]->attributes->category->data;
 
-			if($infograph->data[0]->attributes->image->data==NULL){
+			if($article->data[0]->attributes->image->data==NULL){
 				$data['image']= (object) [
 					'id' => ''
 				];
 			} else {
-				$data['image'] = $infograph->data[0]->attributes->image->data; 
+				$data['image'] = $article->data[0]->attributes->image->data; 
 			}
 
-			$data['created_at'] = date('j-n-Y H:i:s',strtotime($infograph->data[0]->attributes->createdAt)); 
-			$data['updated_at'] = date('j-n-Y H:i:s',strtotime($infograph->data[0]->attributes->updatedAt));
+			$data['created_at'] = date('j-n-Y H:i:s',strtotime($article->data[0]->attributes->createdAt)); 
+			$data['updated_at'] = date('j-n-Y H:i:s',strtotime($article->data[0]->attributes->updatedAt));
+			$data['author'] = $article->data[0]->attributes->penulis->data->attributes->username;
+			$data['opd'] = $article->data[0]->attributes->penulis->data->attributes->opd->data->attributes->name;
+
 			
 		} else {
 			$data['id'] = '';
-			
+			$data['slug'] ='';
+			$data['title'] = '';
+			$data['description'] = '';
+			$data['content'] = '';
+			$data['category'] = (object) [
+				'id' => 0
+			];
 			$data['image'] = (object) [
 				'id' => 1,
 				'attributes' => (object) [
-					'url' => '/uploads/default_image_dd55db19dd.png'
+					'url' => '/uploads/default_image_e0ed843833.png'
 				]
 			];
 			$data['created_at'] = '-';
 			$data['updated_at'] = '-';
-			
+			$data['author'] = '-';
+			$data['opd'] = '-';
 			$data['published'] = false;
 		}
 		
 
-		return view('admin/new_infograph',$data);
+		return view('admin/new_post',$data);
 	}
 
 	public function store()
@@ -207,7 +257,9 @@ class Infographs extends BaseController
 			$post['data'][$singleData[0]] = $singleData[1];
 		}
 
-	
+		$title = $post['data']['title'];
+		$description = $post['data']['description'];
+		$content = $post['content'];
 		if($_FILES){
 			$temp = $_FILES['cover-0']; 
 			if (is_uploaded_file($temp['tmp_name'])){ 
@@ -245,12 +297,36 @@ class Infographs extends BaseController
 		}
 
 
+		
+		$temp_slug = strtolower(str_replace(" ","-",str_replace( array("#", "'", ";", ".", "}", "{", ",", "(", ")", "!", "?", "^", "*", "%"), '',rawurldecode($post['data']['title']))));
+		$id_slug = 2;	
+		$slug = strtolower(str_replace(" ","-",str_replace( array("#", "'", ";", ".", "}", "{", ",", "(", ")", "!", "?", "^", "*", "%"), '',rawurldecode($post['data']['title']))));
+
+
+		while(getPostBySlug($slug)->meta->pagination->total > 0){
+			$slug = $temp_slug.'-'.$id_slug;
+			$id_slug++;
+		}
+
+
 		$Published = (array_key_exists("published",$post['data'])) ? 'true': 'false';
+		$category = $post['data']['category'];
+		$penulis = session()->userData->id; 
 		$image = $cover;
 
 		$data = [
 			"data" => [
+				"title" => $title,
+				"description" => $description,
+				"content" => $content,
+				"slug" => $slug,
 				"Published" => $Published,
+				"category" => [
+					"id" => $category
+				],
+				"penulis" => [
+					"id" => $penulis
+				],
 				"image" => [
 					"id" => $image
 				]
@@ -260,11 +336,11 @@ class Infographs extends BaseController
 		
 		if($post['data']['id']!=''){
 			$id = $post['data']['id'];
-			$response = updateInfograph($id,$data);
+			$response = updateArticle($id,$data);
 			
 		} else {
 
-			$response = postInfograph($data);
+			$response = postArticle($data);
 		}
 		
 		echo json_encode($response);
@@ -345,7 +421,7 @@ class Infographs extends BaseController
 	public function delete()
 	{
 		$post = $this->request->getVar();
-		$response = deleteInfograph($post['id']);
+		$response = deleteArticle($post['id']);
 		echo json_encode($response);
 	}
 

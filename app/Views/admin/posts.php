@@ -69,7 +69,7 @@
        
 
         $('#q').on('input',function(e){
-          $("#allPost").load("<?= base_url().SITE_URL ?>post/getAllPost/1?q="+$('#q').val());
+          $("#allPost").load("<?= base_url().SITE_URL ?>post/getAllPost/1?q="+encodeURI($('#q').val()));
         });
 
         

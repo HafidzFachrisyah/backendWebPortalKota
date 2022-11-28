@@ -13,7 +13,16 @@ ol.example li.placeholder:before { position: absolute; }
 .list-group-item > div { margin-bottom: 5px; }
 
 .list-group-item > div { margin-right:15px !important;}
+
+.modal-backdrop {
+  z-index: 9999 !important;
+}
+
+.modal {
+  z-index: 99999 !important;
+}
 </style>
+
 
 
 
@@ -102,13 +111,15 @@ ol.example li.placeholder:before { position: absolute; }
       </div>
       <div class="modal-body">
         <div class="input-group mb-3">
-        <select class="custom-select" id="categoriesSelect">
-            <option selected>Choose...</option>
-            <option value="<?= FRONTEND_URL ?>berita">Berita</option>
+          <input list="category" class="form-control" id="categoriesSelect" onfocus="this.value=''" placeholder="Choose...">
+          <datalist id="category">
             <?php foreach($categories as $ctgItem ) { ?>
-              <option value="<?= FRONTEND_URL ?>berita/category/<?= $ctgItem->attributes->slug ?>"><?= $ctgItem->attributes->name ?></option>
+            <option value="<?= FRONTEND_URL ?>berita/category/<?= $ctgItem->attributes->slug ?>"><?= $ctgItem->attributes->name ?></option>
             <?php } ?>
-        </select>
+          </datalist>  
+
+          
+       
         </div>
       </div>
       
@@ -129,12 +140,21 @@ ol.example li.placeholder:before { position: absolute; }
       </div>
       <div class="modal-body">
         <div class="input-group mb-3">
-        <select class="custom-select" id="pagesSelect">
+        <input list="page" class="form-control" id="pagesSelect" onfocus="this.value=''" placeholder="Choose...">
+        <datalist id="page">
+          <?php foreach($pages as $page ) { ?>
+          <option value="<?= FRONTEND_URL ?>page/<?= $page->attributes->slug ?>"><?= $page->attributes->title ?></option>
+          <?php } ?>
+        </datalist>  
+
+          <!-- <select class="custom-select" id="pagesSelect">
             <option selected>Choose...</option>
-            <?php foreach($pages as $page ) { ?>
-              <option value="<?= FRONTEND_URL ?>page/<?= $page->attributes->slug ?>"><?= $page->attributes->title ?></option>
-            <?php } ?>
-        </select>
+           
+              
+             
+            </select> -->
+        
+        
         </div>
       </div>
       
@@ -155,7 +175,8 @@ ol.example li.placeholder:before { position: absolute; }
         </div>
       </div>
 
-
+      
+  
 
 
       <script>
@@ -177,7 +198,7 @@ ol.example li.placeholder:before { position: absolute; }
                 const menuArray = rawmenu.split("<script type=");
                 var arrayjson = menuArray[0];
 
-                console.log(arrayjson);
+                // console.log(arrayjson);
                 
                 // sortable list options
                 var sortableListOptions = {
@@ -271,7 +292,11 @@ ol.example li.placeholder:before { position: absolute; }
 
            
 
+           
+
         </script>
+
+        
     
 
 

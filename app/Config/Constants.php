@@ -82,9 +82,9 @@ defined('EXIT__AUTO_MAX')      || define('EXIT__AUTO_MAX', 125); // highest auto
 $protocol = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] != 'off' ? 'https://'.$_SERVER['HTTP_HOST'] : 'http://'.$_SERVER['HTTP_HOST'];
 defined('BASE') || define('BASE',$protocol);
 
-define('FRONTEND_URL','https://dev.frontend.magelangkota.go.id/');
-define('API_URL','https://dev.adminweb.magelangkota.go.id/api/');
-define('API_SITE','https://dev.adminweb.magelangkota.go.id');
+define('FRONTEND_URL','https://magelangkota.go.id/');
+define('API_URL','https://adminweb.magelangkota.go.id/api/');
+define('API_SITE','https://adminweb.magelangkota.go.id');
 define('SITE_URL','/');
 define('API_TOKEN','25524d895d8a0c89f3b68a82a7418d44e979a40887a9a600f445d0aa7c5287264380e7d0608663ac3a609099d7e6775c79ea12c60b24821c433d38eea509684e9d3d1feaebe26f7721833b67d458bfdd099665c9aea88884e9476ab9e7466d7f404c85eb0fa70c26c282a92a3346a681d3e4ba6f0377a69f8dc1bb4a6ce612a6');
 

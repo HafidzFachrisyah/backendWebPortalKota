@@ -236,21 +236,30 @@ class Pages extends BaseController
 
 		$Published = (array_key_exists("published",$page['data'])) ? 'true': 'false';
 
-		$data = [
-			"data" => [
-				"title" => $title,
-				"content" => $content,
-				"slug" => $slug,
-				"Published" => $Published
-			]
-		];
+		
 
 		
 		if($page['data']['id']!=''){
+			$data = [
+				"data" => [
+					"title" => $title,
+					"content" => $content,
+					"Published" => $Published
+				]
+			];
+
 			$id = $page['data']['id'];
 			$response = updatePage($id,$data);
 			
 		} else {
+			$data = [
+				"data" => [
+					"title" => $title,
+					"content" => $content,
+					"slug" => $slug,
+					"Published" => $Published
+				]
+			];
 
 			$response = postPage($data);
 		}

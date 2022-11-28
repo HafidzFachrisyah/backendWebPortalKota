@@ -66,7 +66,7 @@
        
 
         $('#q').on('input',function(e){
-          $("#allOtherLink").load("<?= base_url().SITE_URL ?>otherlink/getAllOtherLink/1?q="+$('#q').val());
+          $("#allOtherLink").load("<?= base_url().SITE_URL ?>otherlink/getAllOtherLink/1?q="+encodeURI($('#q').val()));
         });
 
         

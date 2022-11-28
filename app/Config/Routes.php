@@ -16,12 +16,21 @@ if (file_exists(SYSTEMPATH . 'Config/Routes.php')) {
  * Router Setup
  * --------------------------------------------------------------------
  */
+
+
 if(empty(session()->userData)){
 
     //setup no login route
     $routes->setDefaultNamespace('App\Controllers\auth');
     $routes->setDefaultController('Login');
     $routes->setDefaultMethod('index');
+    
+    //feed route
+    $routes->get('feed/latestyoutube', 'Feed::latestyoutube');
+    $routes->get('feed/youtube', 'Feed::youtube');
+    $routes->get('feed/radio', 'Feed::radio');
+    $routes->get('feed/widget', 'Feed::widget');
+
     //login route
     $routes->get('login', 'Login');
     $routes->post('auth', 'Login::auth');
@@ -31,9 +40,47 @@ if(empty(session()->userData)){
     $routes->addRedirect(':any', '/');
 
 } else {
+
+
+        $jwt = session()->jwt;
+   
+        $authorization = "Authorization: Bearer ".$jwt;
+        
+        $ch = curl_init(API_URL . 'users/me');
+        curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json' , $authorization ));
+      
+        
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        
+        // execute!
+        $response = curl_exec($ch);
+        
+        // close the connection, release resources used
+        curl_close($ch);
+        
+        $response = json_decode($response);
+        // do anything you want with your response
+        
+        if(isset($response->error)){
+            session()->destroy();
+		    redirect()->to(base_url().SITE_URL); 
+
+        }
+        
+     
+
     $routes->setDefaultNamespace('App\Controllers');
+
+     //feed route
+     $routes->get('feed/latestyoutube', 'auth\Feed::latestyoutube');
+     $routes->get('feed/youtube', 'auth\Feed::youtube');
+     $routes->get('feed/radio', 'auth\Feed::radio');
+     $routes->get('feed/widget', 'auth\Feed::widget');
+    
     if(strtolower(session()->userData->role->name)=='admin opd'){
         
+
+
          //dashboard route
         $routes->get('dashboard', 'opd\Dashboard');
         $routes->get('dashboard/getAllPost', 'opd\Dashboard::getAllPost');
@@ -91,7 +138,7 @@ if(empty(session()->userData)){
        $routes->get('post/getAllPost', 'admin\Posts::getAllPost');
        $routes->get('post/getAllPost/(:num)', 'admin\Posts::getAllPost/$1');
        $routes->get('post/getPageCount', 'admin\Posts::getPageCount');
-        $routes->get('post/getPageCount/(:num)/', 'admin\Posts::getPageCount/$1');
+       $routes->get('post/getPageCount/(:num)/', 'admin\Posts::getPageCount/$1');
        $routes->get('post/getPageCount/(:num)', 'admin\Posts::getPageCount/$1');
        $routes->get('post/editor', 'admin\Posts::new');
        $routes->get('post/editor/(:num)', 'admin\Posts::new/$1');
@@ -99,7 +146,7 @@ if(empty(session()->userData)){
        $routes->post('post/upload', 'admin\Posts::upload');
        $routes->post('post/delete', 'admin\Posts::delete');
 
-       $routes->get('inject/store', 'admin\Injects::store');
+    //    $routes->get('inject/store', 'admin\Injects::store');
 
         //page route
         $routes->get('page', 'admin\Pages');
@@ -121,7 +168,7 @@ if(empty(session()->userData)){
          $routes->get('banner/getAllBanner', 'admin\Banners::getAllBanner');
          $routes->get('banner/getAllBanner/(:num)', 'admin\Banners::getAllBanner/$1');
          $routes->get('banner/getPageCount', 'admin\Banners::getPageCount');
-          $routes->get('banner/getPageCount/(:num)/', 'admin\Banners::getPageCount/$1');
+         $routes->get('banner/getPageCount/(:num)/', 'admin\Banners::getPageCount/$1');
          $routes->get('banner/getPageCount/(:num)', 'admin\Banners::getPageCount/$1');
          $routes->get('banner/editor', 'admin\Banners::new');
          $routes->get('banner/editor/(:num)', 'admin\Banners::new/$1');
@@ -161,7 +208,7 @@ if(empty(session()->userData)){
           $routes->get('landingmenu/(:num)', 'admin\LendingMenus/$1');
           $routes->get('landingmenu/getAllLendingMenu', 'admin\LendingMenus::getAllLendingMenu');
           $routes->get('landingmenu/getPageCount', 'admin\LendingMenus::getPageCount');
-           $routes->get('landingmenu/getPageCount/(:num)/', 'admin\LendingMenus::getPageCount/$1');
+          $routes->get('landingmenu/getPageCount/(:num)/', 'admin\LendingMenus::getPageCount/$1');
           $routes->get('landingmenu/getPageCount/(:num)', 'admin\LendingMenus::getPageCount/$1');
           $routes->get('landingmenu/editor', 'admin\LendingMenus::new');
           $routes->get('landingmenu/editor/(:num)', 'admin\LendingMenus::new/$1');
@@ -192,11 +239,22 @@ if(empty(session()->userData)){
         $routes->get('sitesetting', 'admin\Sitesettings');
         $routes->post('sitesetting/store', 'admin\Sitesettings::store');
 
+         //User route
+         $routes->get('user', 'admin\User');
+         $routes->get('user/(:num)', 'admin\User/$1');
+         $routes->get('user/getAllUser', 'admin\User::getAllUser');
+         $routes->get('user/editor', 'admin\User::new');
+         $routes->get('user/editor/(:num)', 'admin\User::new/$1');
+         $routes->get('user/reset/(:num)', 'admin\User::resetUser/$1');
+         $routes->post('user/store', 'admin\User::store');
+         $routes->post('user/delete', 'admin\User::delete');
+
        //profile route
        $routes->get('user/profile', 'admin\User::profile');
        $routes->get('user/password', 'admin\User::password');
        $routes->post('user/profile', 'admin\User::update');
        $routes->post('user/password', 'admin\User::reset');
+
 
        //logout route
        $routes->get('logout', 'auth\Logout');
@@ -205,6 +263,8 @@ if(empty(session()->userData)){
        // //setting route
        $routes->post('update/profile', 'admin\Setting::updateprofile');
        $routes->post('update/password', 'admin\Setting::resetpassword');
+
+        
        
        
        //any undefinition url route to admin dashboard
