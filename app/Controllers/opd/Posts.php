@@ -326,7 +326,7 @@ class Posts extends BaseController
 
 	public function upload()
 	{
-		$accepted_origins = array("http://localhost", "https://127.0.0.1", "https://dev.backend.magelangkota.go.id"); 
+		$accepted_origins = array("http://localhost", "https://127.0.0.1", "https://backend.magelangkota.go.id"); 
 
 	
 
@@ -379,7 +379,7 @@ class Posts extends BaseController
 			//var_dump($filetowrite);die();
 			
 			if($response->status == 200){ 
-				echo '{"location":"https:\/\/dev.adminweb.magelangkota.go.id\/uploads\/'.$response->data[0]->hash.$response->data[0]->ext.'"}';
+				echo '{"location":"https:\/\/adminweb.magelangkota.go.id\/uploads\/'.$response->data[0]->hash.$response->data[0]->ext.'"}';
 
 			}else{ 
 				header("HTTP/1.1 400 Upload failed."); 

@@ -13,6 +13,8 @@
     };
     
     xhr.onload = () => {
+
+      
        
         if (xhr.status === 403) {
             reject({ message: 'HTTP Error: ' + xhr.status, remove: true });
@@ -23,10 +25,13 @@
             reject('HTTP Error: ' + xhr.status);
             return;
         }
+
+        
       
         let text = xhr.responseText;
         const myArray = text.split("<script");
         let word = myArray[0];
+        // let word = text;
         
         console.log(text);
       
